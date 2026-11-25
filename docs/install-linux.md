@@ -184,14 +184,12 @@ manifest、图片与 Safe CSS 校验。换肤开始前，当前皮肤必须已�
 
 ## AppImage 与二进制安装
 
-Dream Skin 优先使用官方 apt 源安装的 Codex：启动前会校验包的仓库来源
-（`platform.openai.com/codex` 或 `*.oaistatic.com/codex-app-prod`）并用 `dpkg -V` 检查
-包文件完整性；来源不是官方仓库的安装会被拒绝换肤。AppImage（放在 `~/Applications/`，
+对于 deb 安装，Dream Skin 使用 `dpkg -V` 检查包文件完整性。如果 APT 列出了该版本的仓库，列表中须包含 OpenAI 官方源。如果该版本只有本机 dpkg 安装记录，也可以启动。AppImage（放在 `~/Applications/`，
 或通过 `CODEX_APP_IMAGE` 指定）也能被发现，但下载文件没有仓库签名可溯源。出于安全，
 换肤前需要一次性确认该文件是官方下载：核对来源后运行一次
 `dreamskin start --allow-unsigned`，工具会记录该文件的 SHA-256 审批（模式 0600，存于
 状态根目录），之后启动无需再带该参数。审批只对当时确认的文件有效，更新 AppImage 后需
-再确认一次；deb 安装走 dpkg 完整性 + 官方源校验，该参数会被忽略。
+再确认一次；deb 安装使用上述包检查，该参数会被忽略。
 
 ## 卸载与恢复
 
@@ -251,7 +249,7 @@ tar.gz 用户也请确认已安装 `curl`。
 ### Codex 更新后主题失效
 
 官方 Codex 升级后重新运行 `dreamskin`（菜单 1）即可；Dream Skin 会在每次启动时重新校验
-官方包来源与完整性。仍异常时先菜单 7 恢复官方外观，再菜单 1 启动。
+包文件完整性及索引中已有的版本来源。仍异常时先菜单 7 恢复官方外观，再菜单 1 启动。
 
 ### 提示「ChatGPT is already running … pass --restart-existing」
 

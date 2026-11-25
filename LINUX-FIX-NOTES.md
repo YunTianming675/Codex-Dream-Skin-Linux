@@ -1,5 +1,16 @@
 # Codex Dream Skin — Linux 修复记录（PR #410 基础上的本地修复）
 
+## 2026-11-25修复
+
+- **启动时提示“资源校验失败”**。更新了顶栏识别规则，让 Dream Skin 能找到新版 ChatGPT 的顶栏。
+- **已有对话看不到背景图**。新版 ChatGPT 的底板遮住了壁纸，现在直接把壁纸画在对话底板上。
+- **点“新聊天”后看不到背景图**。增加了对空白聊天页的识别，发送第一条消息前就能看到壁纸。
+- **更新 ChatGPT 后，Dream Skin 提示找不到官方仓库版本**。本机 APT 索引还没收录该版本时，现在会根据 dpkg 安装记录检查文件完整性，检查通过即可启动。
+
+----
+
+以下是 fork 前的记录
+
 本仓库是 [Fei-Away/Codex-Dream-Skin](https://github.com/Fei-Away/Codex-Dream-Skin) PR #410 源码
 （提交 `22d54c7d1f3c0214472d82caa4052036ded2b2ba`）加上一个**本地修复提交**的完整副本。
 
@@ -58,10 +69,6 @@ bash ~/.local/share/codex-dream-skin/scripts/verify-dream-skin-linux.sh
 
 ## 已知环境坑（与本仓库无关，但会干扰安装/验证）
 
-- **安装器要求“已安装版本出现在官方 APT 元数据里”**。如果本机 apt 列表还没刷新到
-  你装的这个版本，安装会以
-  `The installed Codex version is not available from the official OpenAI repository.`
-  退出 1。先 `sudo apt update`（或把 ChatGPT 升到源里已有的版本）即可。
 - **不要用 sandbox/隔离环境跑测试或安装**：测试会因 Node 无法调用 `/bin/bash` 失败；
   安装脚本读不到 `/var/lib/dpkg` 时会误报“找不到官方应用”。
 - **会话进程保活**：从一次性执行环境（CI、agent 沙盒）里启动 ChatGPT，进程会随会话

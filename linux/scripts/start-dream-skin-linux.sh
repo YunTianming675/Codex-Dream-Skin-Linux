@@ -73,7 +73,7 @@ ensure_node_runtime
 # --allow-unsigned records a one-time approval for the exact discovered
 # AppImage/binary executable so the install verification below can pass. It
 # only applies to the appimage|binary launch kinds: deb installs are verified
-# via dpkg integrity + official apt origin instead, so the flag is a no-op
+# via dpkg integrity and available APT sources, so the flag is a no-op
 # there. The record runs after discovery resolved CODEX_EXE and before
 # verify_codex_install; discovery fails closed on a missing executable, and
 # record_appimage_approval fails closed if the file cannot be hashed.
@@ -97,7 +97,7 @@ fi
 
 # A connected renderer can show progress before the install check. Before this
 # script launches or restarts Codex, verify the complete install. Linux has a
-# single verification mode (dpkg integrity + OpenAI repo, or a recorded
+# single verification mode (dpkg integrity and indexed sources, or a recorded
 # AppImage/binary approval), so the macOS deep/quick split does not apply.
 verify_codex_install
 

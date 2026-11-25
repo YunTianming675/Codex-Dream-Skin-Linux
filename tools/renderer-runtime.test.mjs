@@ -229,7 +229,7 @@ function makeFixture({
     partFixtures.composerToolbar = makeDomNode("composer-toolbar", partFixtures.composer);
     register("aside.app-shell-left-panel", partFixtures.sidebar);
     register("main:is(.main-surface, [data-app-shell-main-surface], [class*=\"_MainContentSurface_\"])", partFixtures.main);
-    register("header:is(.app-header-tint, [data-app-shell-header-edge-scroll], [class*=\"_Header_\"])", partFixtures.header);
+    register("header:is([data-app-shell-titlebar], .app-header-tint, [data-app-shell-header-edge-scroll], [class*=\"_Header_\"])", partFixtures.header);
     register('[data-testid="home-icon"]', partFixtures.homeIcon);
     register('[data-feature="game-source"]', partFixtures.homeHero);
     register('[role="main"]:has([data-testid="home-icon"])', partFixtures.home);
@@ -669,7 +669,7 @@ export async function runRendererRuntimeTest(assetRoot) {
   // canonical CSS therefore gates on the :has()-free home-route-css alias.
   assert.match(css, /main:is\(\.main-surface, \[data-app-shell-main-surface\], \[class\*=\"_MainContentSurface_\"\]\):has\(\[role="main"\]\)/);
   assert.match(css, /main:is\(\.main-surface, \[data-app-shell-main-surface\], \[class\*=\"_MainContentSurface_\"\]\):not\(:has\(\[role="main"\]\)\)/);
-  assert.match(css, /header:is\(\.app-header-tint, \[data-app-shell-header-edge-scroll\], \[class\*=\"_Header_\"\]\)/);
+  assert.match(css, /header:is\(\[data-app-shell-titlebar\], \.app-header-tint, \[data-app-shell-header-edge-scroll\], \[class\*=\"_Header_\"\]\)/);
   assert.match(css, /:is\(\.app-shell-main-content-top-fade, \[data-app-shell-main-content-top-fade\]:empty, \[class\*=\"_MainContentTopFade_\"\]\)/);
   assert.doesNotMatch(css, /\[data-app-shell-main-content-top-fade\](?!:empty)/,
     "The fade state attribute can belong to the entire conversation; never hide a nonempty owner.");
@@ -684,6 +684,17 @@ export async function runRendererRuntimeTest(assetRoot) {
     /:is\(\[class~="group\/application-menu-top-bar"\], \[class\*="_ApplicationMenuTopBar_"\]\)[\s\S]{0,140}background:\s*rgb\(var\(--ds-panel-rgb\) \/ \.38\)/,
     "The current Windows application menu bar must use the themed acrylic surface.",
   );
+  const backingRule = css.split("}").find(rule => rule.includes('[data-app-shell-surface-backing="true"]'));
+  assert.ok(backingRule, "Wide thread artwork must reach the native workspace backing.");
+  const homeBackingSelector = 'html[data-dream-skin="active"][data-dream-wallpaper="on"]'
+    + ' [data-app-shell-workspace]:has(> [data-app-shell-active-page="true"][data-rail-home-surface="home"])'
+    + ' > [data-app-shell-surface-backing="true"]';
+  assert.ok(backingRule.replace(/\s+/g, " ").includes(homeBackingSelector),
+    "An active empty chat must paint its backing before a thread scroller exists.");
+  const backingSelector = backingRule.slice(backingRule.lastIndexOf('html['), backingRule.indexOf('{')).trim();
+  assert.ok(backingSelector.includes('[data-dream-wallpaper="on"][data-dream-art-wide="true"]'));
+  assert.ok(backingSelector.includes('[data-app-shell-workspace]:has(> [data-app-shell-active-page="true"] .thread-scroll-container) > [data-app-shell-surface-backing="true"]'));
+  assert.match(backingRule, /background-image:[^;]*var\(--dream-skin-art\)/);
   assert.match(css, /--ds-task-full-veil/);
   assert.match(css, /data-dream-task-mode="full"/);
   assert.match(css, /background-image:\s*var\(--ds-task-full-veil\),\s*var\(--dream-skin-art\)/);

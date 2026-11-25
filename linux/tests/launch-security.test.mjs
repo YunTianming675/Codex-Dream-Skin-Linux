@@ -42,9 +42,25 @@ test("an official candidate does not authenticate a different installed version"
         500 https://untrusted.example/repo stable/main amd64 Packages
         100 /var/lib/dpkg/status
 `;
-  assert.notEqual(shell('installed_codex_origin_is_official "$1" "$2"', policy, "1.0").status, 0);
-  assert.equal(shell('installed_codex_origin_is_official "$1" "$2"', policy, "2.0").status, 0);
-  assert.notEqual(shell('installed_codex_origin_is_official "$1" "$2"', policy, "3.0").status, 0);
+  assert.notEqual(shell('installed_codex_sources_allowed "$1" "$2"', policy, "1.0").status, 0);
+  assert.equal(shell('installed_codex_sources_allowed "$1" "$2"', policy, "2.0").status, 0);
+  assert.notEqual(shell('installed_codex_sources_allowed "$1" "$2"', policy, "3.0").status, 0);
+});
+
+test("a dpkg-only installed version is accepted with a stale or empty repository index", () => {
+  const installed = `chatgpt:
+  Installed: 2.0
+  Candidate: 2.0
+  Version table:
+ *** 2.0 100
+        100 /var/lib/dpkg/status
+`;
+  const older = `     1.0 500
+        500 https://persistent.oaistatic.com/codex-app-prod/linux/deb stable/main amd64 Packages
+`;
+  for (const policy of [installed, installed + older]) {
+    assert.equal(shell('installed_codex_sources_allowed "$1" "$2"', policy, "2.0").status, 0);
+  }
 });
 
 test("CDP listener inspection rejects wildcard and mixed binds", () => {

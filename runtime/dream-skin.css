@@ -346,15 +346,15 @@ html[data-dream-skin="active"]:is([data-dream-task-mode="ambient"], [data-dream-
   height: auto;
 }
 
-html[data-dream-skin="active"]:is([data-dream-task-mode="ambient"], [data-dream-art-task-mode="ambient"], [data-dream-task-mode="banner"], [data-dream-art-task-mode="banner"])[data-dream-art-wide="true"]:has(__DREAM_SELECTOR_SHELL_MAIN__):not(:has(__DREAM_SELECTOR_SHELL_MAIN__ __DREAM_SELECTOR_HOME_ROUTE_CSS__)) body {
-  background-image: linear-gradient(rgb(var(--ds-bg-rgb) / var(--ds-wallpaper-dim, .5)), rgb(var(--ds-bg-rgb) / var(--ds-wallpaper-dim, .5))), var(--dream-skin-art) !important;
-  background-position: var(--ds-art-position) !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  background-attachment: fixed !important;
-}
-
-html[data-dream-skin="active"]:is([data-dream-task-mode="full"], [data-dream-art-task-mode="full"])[data-dream-art-wide="true"]:has(__DREAM_SELECTOR_SHELL_MAIN__):not(:has(__DREAM_SELECTOR_SHELL_MAIN__ __DREAM_SELECTOR_HOME_ROUTE_CSS__)) body {
+/* Newer workspaces paint an opaque backing behind the active page. Give it
+   the same fixed artwork as the body, aligned across the sidebar boundary.
+   The new-chat home has no transcript yet. Cached pages must not opt in. */
+html[data-dream-skin="active"]:is([data-dream-task-mode="ambient"], [data-dream-art-task-mode="ambient"], [data-dream-task-mode="banner"], [data-dream-art-task-mode="banner"])[data-dream-art-wide="true"]:has(__DREAM_SELECTOR_SHELL_MAIN__):not(:has(__DREAM_SELECTOR_SHELL_MAIN__ __DREAM_SELECTOR_HOME_ROUTE_CSS__)) body,
+html[data-dream-skin="active"]:is([data-dream-task-mode="full"], [data-dream-art-task-mode="full"])[data-dream-art-wide="true"]:has(__DREAM_SELECTOR_SHELL_MAIN__):not(:has(__DREAM_SELECTOR_SHELL_MAIN__ __DREAM_SELECTOR_HOME_ROUTE_CSS__)) body,
+html[data-dream-skin="active"][data-dream-wallpaper="on"]
+  [data-app-shell-workspace]:has(> [data-app-shell-active-page="true"][data-rail-home-surface="home"]) > [data-app-shell-surface-backing="true"],
+html[data-dream-skin="active"][data-dream-wallpaper="on"][data-dream-art-wide="true"]:is([data-dream-task-mode="full"], [data-dream-task-mode="ambient"], [data-dream-task-mode="banner"])
+  [data-app-shell-workspace]:has(> [data-app-shell-active-page="true"] __DREAM_SELECTOR_THREAD_SURFACE__) > [data-app-shell-surface-backing="true"] {
   background-image: linear-gradient(rgb(var(--ds-bg-rgb) / var(--ds-wallpaper-dim, .5)), rgb(var(--ds-bg-rgb) / var(--ds-wallpaper-dim, .5))), var(--dream-skin-art) !important;
   background-position: var(--ds-art-position) !important;
   background-size: cover !important;

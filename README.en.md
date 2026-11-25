@@ -35,7 +35,6 @@ See [LINUX-FIX-NOTES.md](./LINUX-FIX-NOTES.md) (Chinese) for root cause and veri
 ## Install
 
 ```bash
-sudo apt update                 # required: the installer checks the official APT metadata
 pkill -f '/usr/lib/chatgpt/ChatGPT' || true   # fully quit ChatGPT first
 
 git clone https://github.com/Tesla-SHT/Codex-Dream-Skin-Linux.git
@@ -66,8 +65,7 @@ dreamskin restore               # restore the official appearance
 ## Notes
 
 1. **Quit ChatGPT before installing.** The installer rewrites `~/.codex/config.toml`.
-2. **Run `sudo apt update` first.** A stale index produces
-   `The installed Codex version is not available from the official OpenAI repository.`
+2. After a ChatGPT update, Dream Skin can verify the installed files with dpkg even when the repository index does not list that version.
 3. The skin launches ChatGPT with a **loopback-only** debugging port (9335/9341).
 4. A client update can change the DOM again; re-check selectors if the layout breaks.
 5. **Do not install or verify inside containers / CI / sandboxes** — they often cannot see

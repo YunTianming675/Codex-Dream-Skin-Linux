@@ -78,7 +78,7 @@ codex_origin_is_official() {
     | /usr/bin/grep -Eq '(^|[[:space:]])https://platform\.openai\.com/codex/|(^|[[:space:]])https://([a-z0-9.-]+\.)?oaistatic\.com/codex-app-prod/'
 }
 
-installed_codex_origin_is_official() {
+installed_codex_sources_allowed() {
   local policy_output="${1:-}" installed_version="${2:-}"
   [ -n "$installed_version" ] || return 1
   local version_policy=""
@@ -87,7 +87,15 @@ installed_codex_origin_is_official() {
     NF == 2 && $2 ~ /^[0-9]+$/ { active = ($1 == wanted); next }
     active { print }
   ')"
-  codex_origin_is_official "$version_policy"
+  if codex_origin_is_official "$version_policy"; then return 0; fi
+  # An update can precede the local APT index, and older builds can age out.
+  # A status-only entry still goes through dpkg integrity verification.
+  printf '%s\n' "$version_policy" | /usr/bin/awk '
+    NF == 0 { next }
+    NF == 2 && $1 ~ /^[0-9]+$/ && $2 == "/var/lib/dpkg/status" { installed = 1; next }
+    { other = 1 }
+    END { exit !(installed && !other) }
+  '
 }
 
 listeners_are_loopback() {
@@ -201,8 +209,8 @@ verify_codex_install() {
       [ -x /usr/bin/apt-cache ] || fail "apt-cache is required to verify the installed Codex package."
       policy_output="$(LC_ALL=C /usr/bin/apt-cache policy "$CODEX_PACKAGE" 2>/dev/null)" || fail "Could not read Codex package origin metadata."
       installed_version="$(/usr/bin/dpkg-query -W -f='${Version}' "$CODEX_PACKAGE" 2>/dev/null)" || fail "Could not read the installed Codex version."
-      installed_codex_origin_is_official "$policy_output" "$installed_version" \
-        || fail "The installed Codex version is not available from the official OpenAI repository. Restore or reinstall the official app before continuing."
+      installed_codex_sources_allowed "$policy_output" "$installed_version" \
+        || fail "Could not verify the APT source entry for the installed Codex version. Check apt-cache policy for the installed package."
       local integrity_output=""
       integrity_output="$(/usr/bin/dpkg -V "$CODEX_PACKAGE" 2>/dev/null)" || fail "Could not verify Codex package integrity."
       if [ -n "$integrity_output" ]; then

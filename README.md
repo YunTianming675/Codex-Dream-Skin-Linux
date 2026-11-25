@@ -56,9 +56,6 @@ PR #410 快照（`22d54c7`），并修复了新版客户端上的严重回归、
 ### 方式一：从源码安装（推荐，无需 root 改系统）
 
 ```bash
-# 0) 关键前置：刷新 apt 索引，让官方源元数据包含你当前安装的版本
-sudo apt update
-
 # 1) 完全退出 ChatGPT（托盘也要退），否则安装会拒绝改写 config.toml
 pkill -f '/usr/lib/chatgpt/ChatGPT' || true
 
@@ -128,8 +125,7 @@ dreamskin status             # 查看状态
 ## 需要注意什么
 
 1. **安装前必须完全退出 ChatGPT。** 安装器要改写 `~/.codex/config.toml`，运行中改写会被拒绝。
-2. **先 `sudo apt update`。** 安装器会校验「当前安装版本是否出现在官方 APT 元数据里」，索引过期会报
-   `The installed Codex version is not available from the official OpenAI repository.`，这是安全校验，不是 bug。
+2. **更新 ChatGPT 后可直接启动。** APT 索引未收录已安装版本时，Dream Skin 使用本机 dpkg 记录检查包文件完整性。
 3. **会重启 ChatGPT 的调试端口。** `dreamskin start` 用 `--remote-debugging-port` 启动客户端（默认 9335/9341），仅绑定 `127.0.0.1`。若你所在环境不允许本地调试端口，皮肤无法工作。
 4. **升级官方客户端可能再次失效。** 官方改动 DOM 结构后，选择器需要更新；遇到黑屏或布局错乱请先看
    [LINUX-FIX-NOTES.md](./LINUX-FIX-NOTES.md) 与 `dreamskin status --deep`。
@@ -146,7 +142,7 @@ dreamskin status             # 查看状态
 | 点菜单 1 后终端窗口一闪就没了 | 多半是 Codex 已在运行、且不是带端口的实例。菜单会询问是否重启；直接命令行启动请加 `--restart-existing` |
 | 首页正常、点开对话黑屏 | 本仓库已修复；确认用的是本仓库资产并重新 `dreamskin start` |
 | 皮肤在但背景图几乎看不见 | 检查是不是把透明度调得太高：`dreamskin wallpaper opacity 50`，或在设置面板点「恢复 50%」 |
-| `找不到官方应用` / 版本校验失败 | `sudo apt update`，确认 `dpkg -l chatgpt` 有记录 |
+| `找不到官方应用` | 用 `dpkg -l chatgpt` 确认客户端已安装 |
 | 面板打不开或提示缺 tkinter | `sudo apt install python3-tk` |
 | `ChatGPT is already running without ... CDP endpoint` | 先完全退出 ChatGPT，或加 `--restart-existing` |
 | 皮肤没生效但进程在 | `dreamskin status --deep`；必要时 `dreamskin pause` 后重新 `start` |
